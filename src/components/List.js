@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table'
 import Spinner from 'react-bootstrap/Spinner'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
 import Pagination from './Pagination'
+import Search from './Search'
+
 
 const List = () => {
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
   const [data, setData] = useState(null)
+  const [keywords, setKeywords] = useState([])
   let history = useHistory();
 
   useEffect(() => {
@@ -34,27 +40,20 @@ const List = () => {
     history.push(`?page=${pages + num}`);
   }
 
-  const renderBooks = () => {
-    return <tbody>{data.books.map((book, i) => {
-      return (
-        <tr key={book.id}>
-          <td>{i + 1}</td>
-          <td>{book.id}</td>
-          <td>{book.book_title}</td>
-          <td>{book.book_author}</td>
-          <td>{book.book_publication_city} - {book.book_publication_country} - {book.book_publication_year}</td>
-          <td>{book.book_pages}</td>
-        </tr>
-      )
-    })}</tbody>
+  const onSubmit = (e) => {
+    e.preventDefault()
+    axios.post('http://nyx.vima.ekt.gr:3000/api/books', {
+      page: pages,
+      filters:[{type: "all", values: keywords.split(' ')}]
+    })
+    .then(res => {
+      setData(res.data)
+    })
+    .catch(e => console.log(e))
   }
-  if (!data) return (
-    <Spinner animation="border" role="status">
-      <span className="sr-only">Loading...</span>
-    </Spinner>
-  )
-  return (
-    <div>
+
+  const renderTable = () => {
+    return (
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -66,8 +65,32 @@ const List = () => {
             <th>Pages</th>
           </tr>
         </thead>
-        {data && renderBooks()}
+        {<tbody>{data.books.map((book, i) => {
+          return (
+            <tr key={book.id}>
+              <td>{i + 1}</td>
+              <td>{book.id}</td>
+              <td>{book.book_title}</td>
+              <td>{book.book_author}</td>
+              <td>{book.book_publication_city} - {book.book_publication_country} - {book.book_publication_year}</td>
+              <td>{book.book_pages}</td>
+            </tr>
+          )})}
+        </tbody>}
       </Table>
+    )
+  }
+
+  if (!data) return (
+    <Spinner animation="border" role="status">
+      <span className="sr-only">Loading...</span>
+    </Spinner>
+  )
+
+  return (
+    <div>
+      <Search keywords={keywords} setKeywords={setKeywords} onSubmit={onSubmit} />
+      {renderTable()}
       <Pagination pages={pages} setPages={setPages} handleClick={handleClick} totalPages={totalPages} />
     </div>
   );
