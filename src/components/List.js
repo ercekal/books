@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table'
 import Spinner from 'react-bootstrap/Spinner'
-import InputGroup from 'react-bootstrap/InputGroup'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
 import Pagination from './Pagination'
@@ -42,6 +39,7 @@ const List = () => {
 
   const onSubmit = (e) => {
     e.preventDefault()
+    history.push(`/`);
     axios.post('http://nyx.vima.ekt.gr:3000/api/books', {
       page: pages,
       filters:[{type: "all", values: keywords.split(' ')}]
@@ -53,6 +51,7 @@ const List = () => {
   }
 
   const renderTable = () => {
+    if (data.books.length === 0) return 'There is no suitable result. Please change the keywords'
     return (
       <Table striped bordered hover>
         <thead>
@@ -91,7 +90,7 @@ const List = () => {
     <div>
       <Search keywords={keywords} setKeywords={setKeywords} onSubmit={onSubmit} />
       {renderTable()}
-      <Pagination pages={pages} setPages={setPages} handleClick={handleClick} totalPages={totalPages} />
+      {data.books.length !== 0 && <Pagination pages={pages} setPages={setPages} handleClick={handleClick} totalPages={totalPages} />}
     </div>
   );
 };
