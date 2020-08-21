@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <Route exact path="/home">
+        <Route exact path="/">
           <List />
         </Route>
       </Router>

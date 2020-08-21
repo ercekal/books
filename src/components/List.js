@@ -1,23 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Pagination from 'react-bootstrap/Pagination'
 import axios from 'axios'
-import {
-  BrowserRouter as Router,
-  Route,
-  useHistory,
-  useLocation
-} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const List = () => {
-  const [pages, setPages] = useState((new URLSearchParams(window.location.search)).get("page") || 1)
+  const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
   const [data, setData] = useState({})
   let history = useHistory();
-  console.log('data: ', data);
 
   useEffect(() => {
     axios.post('http://nyx.vima.ekt.gr:3000/api/books', {page: pages})
     .then(res => {
-      // history.push(`/?page=${pages}`);
       setData(res.data)
     })
     .catch(e => console.log(e))
@@ -32,11 +25,9 @@ const List = () => {
     .catch(e => console.log(e))
   }, [pages])
 
-  console.log('history: ', history);
   let items = [];
-  const totalPagess = Math.ceil(data.count / 20)
-  console.log('totalPagess: ', totalPagess);
-  for (let number = 1; number <= totalPagess; number++) {
+  const totalPages = Math.ceil(data.count / 20)
+  for (let number = 1; number <= totalPages; number++) {
     items.push(
       <Pagination.Item key={number} pages={number === pages}>
         {number}
@@ -46,7 +37,7 @@ const List = () => {
 
   function handleClick(num) {
     setPages(pages + num)
-    history.push(`/home?page=${pages + num}`);
+    history.push(`?page=${pages + num}`);
   }
 
   const renderPagination = () => {
@@ -70,9 +61,9 @@ const List = () => {
         {pages !== 1 && <Pagination.Prev onClick={() => setPages(pages - 1)}/>}
         {pages > 2 && before}
         <Pagination.Item active>{pages}</Pagination.Item>
-        {pages < totalPagess - 2 && after}
-        {pages !== totalPagess && <Pagination.Next onClick={() => setPages(pages + 1)}/>}
-        {pages !== totalPagess && <Pagination.Last onClick={() => setPages(totalPagess)}/>}
+        {pages < totalPages - 2 && after}
+        {pages !== totalPages && <Pagination.Next onClick={() => setPages(pages + 1)}/>}
+        {pages !== totalPages && <Pagination.Last onClick={() => setPages(totalPages)}/>}
       </Pagination>
     )
   }
