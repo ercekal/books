@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import Pagination from 'react-bootstrap/Pagination'
+import Table from 'react-bootstrap/Table'
+import Pagination from './Pagination'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
 
 const List = () => {
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
-  const [data, setData] = useState({})
+  const [data, setData] = useState(null)
   let history = useHistory();
 
   useEffect(() => {
@@ -19,57 +20,50 @@ const List = () => {
   useEffect(() => {
     axios.post('http://nyx.vima.ekt.gr:3000/api/books', {page: pages})
     .then(res => {
-      history.push(`/?page=${pages}`);
+      console.log('res: ', res.data);
       setData(res.data)
     })
     .catch(e => console.log(e))
   }, [pages])
 
-  let items = [];
-  const totalPages = Math.ceil(data.count / 20)
-  for (let number = 1; number <= totalPages; number++) {
-    items.push(
-      <Pagination.Item key={number} pages={number === pages}>
-        {number}
-      </Pagination.Item>,
-    );
-  }
+  const totalPages = data && Math.ceil(data.count / 20)
 
   function handleClick(num) {
     setPages(pages + num)
     history.push(`?page=${pages + num}`);
   }
 
-  const renderPagination = () => {
-    let before = (
-      <>
-        <Pagination.Item onClick={() => handleClick(- 2)}>{pages - 2}</Pagination.Item>
-        <Pagination.Item onClick={() => handleClick(- 1)}>{pages - 1}</Pagination.Item>
-      </>
-    )
-
-    let after = (
-      <>
-        <Pagination.Item onClick={() => handleClick(1)}>{pages + 1}</Pagination.Item>
-        <Pagination.Item onClick={() => handleClick(2)}>{pages + 2}</Pagination.Item>
-      </>
-    )
-
-    return (
-      <Pagination>
-        {pages !== 1 && <Pagination.First onClick={() => setPages(1)}/>}
-        {pages !== 1 && <Pagination.Prev onClick={() => setPages(pages - 1)}/>}
-        {pages > 2 && before}
-        <Pagination.Item active>{pages}</Pagination.Item>
-        {pages < totalPages - 2 && after}
-        {pages !== totalPages && <Pagination.Next onClick={() => setPages(pages + 1)}/>}
-        {pages !== totalPages && <Pagination.Last onClick={() => setPages(totalPages)}/>}
-      </Pagination>
-    )
+  const renderBooks = () => {
+    return <tbody>{data.books.map((book, i) => {
+      return (
+        <tr key={book.id}>
+          <td>{i + 1}</td>
+          <td>{book.id}</td>
+          <td>{book.book_title}</td>
+          <td>{book.book_author}</td>
+          <td>{book.book_publication_city} - {book.book_publication_country} - {book.book_publication_year}</td>
+          <td>{book.book_pages}</td>
+        </tr>
+      )
+    })}</tbody>
   }
+
   return (
     <div>
-      {renderPagination()}
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>id</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Details</th>
+            <th>Pages</th>
+          </tr>
+        </thead>
+        {data && renderBooks()}
+      </Table>
+      <Pagination pages={pages} setPages={setPages} handleClick={handleClick} totalPages={totalPages} />
     </div>
   );
 };
