@@ -1,5 +1,6 @@
 import React from 'react';
 import Pagination from 'react-bootstrap/Pagination'
+import './Pagination.scss';
 
 const PaginationComponent = ({pages, setPages, handleClick, totalPages}) => {
   let before = (
@@ -17,7 +18,7 @@ const PaginationComponent = ({pages, setPages, handleClick, totalPages}) => {
   )
 
   return (
-    <Pagination>
+    <Pagination className='pagination'>
       {pages !== 1 && <Pagination.First onClick={() => setPages(1)}/>}
       {pages !== 1 && <Pagination.Prev onClick={() => setPages(pages - 1)}/>}
       {pages > 2 && before}

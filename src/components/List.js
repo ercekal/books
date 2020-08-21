@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table'
-import Pagination from './Pagination'
+import Spinner from 'react-bootstrap/Spinner'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
+import Pagination from './Pagination'
 
 const List = () => {
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
@@ -47,7 +48,11 @@ const List = () => {
       )
     })}</tbody>
   }
-
+  if (!data) return (
+    <Spinner animation="border" role="status">
+      <span className="sr-only">Loading...</span>
+    </Spinner>
+  )
   return (
     <div>
       <Table striped bordered hover>
