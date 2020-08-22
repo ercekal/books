@@ -6,15 +6,16 @@ import { useHistory } from "react-router-dom";
 import Pagination from './Pagination'
 import Search from './Search'
 
+const API_URL = 'http://nyx.vima.ekt.gr:3000/api/books'
 
 const List = () => {
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
   const [data, setData] = useState(null)
   const [keywords, setKeywords] = useState([])
   let history = useHistory();
-
+  let totalPages = !!data && Math.ceil(data.count / 20)
   useEffect(() => {
-    axios.post('http://nyx.vima.ekt.gr:3000/api/books', {page: pages})
+    axios.post(API_URL, {page: pages})
     .then(res => {
       setData(res.data)
     })
@@ -22,15 +23,15 @@ const List = () => {
   }, [])
 
   useEffect(() => {
-    axios.post('http://nyx.vima.ekt.gr:3000/api/books', {page: pages})
-    .then(res => {
-      console.log('res: ', res.data);
-      setData(res.data)
+    const keywordsData = keywords.length === 0 ? null : keywords.split(' ')
+    axios.post(API_URL, {
+      page: pages,
+      filters: [{type: "all", values: keywordsData}]
     })
+    .then(res => setData(res.data))
     .catch(e => console.log(e))
   }, [pages])
 
-  const totalPages = data && Math.ceil(data.count / 20)
 
   function handleClick(num) {
     setPages(pages + num)
@@ -40,12 +41,13 @@ const List = () => {
   const onSubmit = (e) => {
     e.preventDefault()
     history.push(`/`);
-    axios.post('http://nyx.vima.ekt.gr:3000/api/books', {
+    axios.post(API_URL, {
       page: pages,
       filters:[{type: "all", values: keywords.split(' ')}]
     })
     .then(res => {
       setData(res.data)
+      totalPages = Math.ceil(res.data.count / 20)
     })
     .catch(e => console.log(e))
   }

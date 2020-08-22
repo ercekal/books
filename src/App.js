@@ -5,10 +5,11 @@ import {
 } from "react-router-dom";
 import List from './components/List'
 import './App.scss';
+import './scss/custom.scss';
 
 function App() {
   return (
-    <div className="App">
+    <div className="App bg-primary">
       <Router>
         <Route exact path="/">
           <List />

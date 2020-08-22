@@ -3,6 +3,7 @@ import Pagination from 'react-bootstrap/Pagination'
 import './Pagination.scss';
 
 const PaginationComponent = ({pages, setPages, handleClick, totalPages}) => {
+  console.log('totalPages: ', totalPages);
   let before = (
     <>
       <Pagination.Item onClick={() => handleClick(- 2)}>{pages - 2}</Pagination.Item>
