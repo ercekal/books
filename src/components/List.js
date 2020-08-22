@@ -11,7 +11,6 @@ const  API_URL = 'http://nyx.vima.ekt.gr:3000/api/books'
 const List = () => {
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
   const [data, setData] = useState(null)
-  const [keywords, setKeywords] = useState([])
   let history = useHistory();
 
   useEffect(() => {
@@ -23,26 +22,25 @@ const List = () => {
   }, [])
 
   useEffect(() => {
+    history.push(`?page=${pages}`);
     axios.post(API_URL, {page: pages})
     .then(res => setData(res.data))
     .catch(e => console.log(e))
   }, [pages])
 
-  const totalPages = data && Math.ceil(data.count / 20)
+  let totalPages = !!data && Math.ceil(data.count / 20)
 
-  function handleClick(num) {
-    setPages(pages + num)
-    history.push(`?page=${pages + num}`);
-  }
-
-  const onSubmit = (e) => {
+  const onSubmit = (e, keywords) => {
     e.preventDefault()
     history.push(`/`);
     axios.post(API_URL, {
       page: 1,
       filters:[{type: "all", values: keywords.split(' ')}]
     })
-    .then(res => setData(res.data))
+    .then(res => {
+      totalPages = Math.ceil(res.data.count / 20)
+      setData(res.data)
+    })
     .catch(e => console.log(e))
   }
 
@@ -81,12 +79,15 @@ const List = () => {
       <span className="sr-only">Loading...</span>
     </Spinner>
   )
-
   return (
     <div>
-      <Search keywords={keywords} setKeywords={setKeywords} onSubmit={onSubmit} />
+      <Search onSubmit={onSubmit} />
       {renderTable()}
-      {data.books.length !== 0 && <Pagination pages={pages} setPages={setPages} handleClick={handleClick} totalPages={totalPages} />}
+      {data.books.length !== 0 &&
+        <Pagination
+          pages={pages}
+          setPages={setPages}
+          totalPages={!!data && Math.ceil(data.count / 20)} />}
     </div>
   );
 };

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import './Search.scss';
 
-const Search = ({setKeywords, onSubmit, keywords}) => {
+const Search = ({ onSubmit }) => {
+  const [keywords, setKeywords] = useState([])
+
   return (
     <Form inline>
       <Form.Control
@@ -13,7 +15,7 @@ const Search = ({setKeywords, onSubmit, keywords}) => {
         onChange={e => setKeywords(e.target.value)}
         value={keywords}
         />
-      <Button type="submit" className="mb-2 btn-primary" onClick={onSubmit}>
+      <Button type="submit" className="mb-2 btn-primary" onClick={(e) => onSubmit(e, keywords)}>
         Search
       </Button>
     </Form>
