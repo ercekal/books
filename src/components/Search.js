@@ -6,7 +6,8 @@ import "./Search.scss"
 
 const Search = ({ onSubmit, keywords, setKeywords }) => {
   return (
-    <Form inline>
+    <div className='search'>
+      <Form inline>
       <Form.Control
         className="mb-2 mr-sm-2 "
         id="inlineFormInputName2"
@@ -22,6 +23,7 @@ const Search = ({ onSubmit, keywords, setKeywords }) => {
         Search
       </Button>
     </Form>
+    </div>
   )
 }
 

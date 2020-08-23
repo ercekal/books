@@ -19,20 +19,25 @@ const List = () => {
   const history = useHistory()
 
   useEffect(() => {
-    const searchObj = {
-      page: pages,
-    }
-    if (keywords.length > 0) {
-      history.push(`/?page=${pages}&search=${keywords}`)
-      searchObj.filters = [{ type: "all", values: [keywords] }]
-    }
-    axios
-      .post(API_URL, searchObj)
-      .then((res) => {
-        setData(res.data)
-      })
-      .catch((err) => console.log(err))
-  }, [])
+    async function fetchData() {
+      const searchObj = {
+        page: pages,
+      }
+      if (keywords.length > 0) {
+        searchObj.filters = [{ type: "all", values: [keywords] }]
+      }
+      try {
+        const response = await axios
+        .post(API_URL, searchObj)
+        history.push(`/?page=${pages}&search=${keywords}`)
+        setData(response.data)
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line
+}, []);
 
   let totalPages = !!data && Math.ceil(data.count / 20)
 
@@ -100,9 +105,10 @@ const List = () => {
         </thead>
         <tbody>
           {data.books.map((book, i) => {
+            const num = pages === 1 ? 0 : (pages - 1) * 20
             return (
               <tr key={book.id}>
-                <td>{i + 1}</td>
+                <td>{num + i + 1}</td>
                 <td>{book.id}</td>
                 <td>{book.book_title}</td>
                 <td>{book.book_author}</td>
