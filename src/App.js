@@ -1,11 +1,8 @@
-import React from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-} from "react-router-dom";
-import List from './components/List'
-import './App.scss';
-import './scss/custom.scss';
+import React from "react"
+import { BrowserRouter as Router, Route } from "react-router-dom"
+import List from "./components/List"
+import "./App.scss"
+import "./scss/custom.scss"
 
 function App() {
   return (
@@ -16,7 +13,7 @@ function App() {
         </Route>
       </Router>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
