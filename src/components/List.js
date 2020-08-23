@@ -12,22 +12,21 @@ const List = () => {
   const searchTerms = new URLSearchParams(window.location.search).get("search")
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
   const [data, setData] = useState(null)
-  const [keywords, setKeywords] = useState(searchTerms ? searchTerms.split('+') : [])
-  console.log('keywords: ', keywords);
+  const [keywords, setKeywords] = useState(searchTerms ? searchTerms : [''])
 
   let history = useHistory();
 
   useEffect(() => {
-    let obj = {
+    const searchObj = {
       page: pages
     }
     if (keywords.length > 0) {
-      obj.filters = [{type: "all", values: keywords}]
+      history.push(`/?page=${pages}&search=${keywords}`);
+      searchObj.filters = [{type: "all", values: [keywords]}]
     }
-    axios.post(API_URL, {
-      obj
-    })
-
+    axios.post(API_URL,
+      searchObj
+    )
     .then(res => {
       setData(res.data)
     })
@@ -37,10 +36,10 @@ const List = () => {
   let totalPages = !!data && Math.ceil(data.count / 20)
 
   const onSubmit = (e, keywords) => {
-    console.log('keywords: ', keywords);
     e.preventDefault()
     if (keywords.length > 0) {
-      history.push(`/?page=${pages}&search=${keywords.split(' ', '+')}`);
+      setPages(1)
+      history.push(`/?page=${1}&search=${keywords}`);
       setPages(1)
       axios.post(API_URL, {
         filters:[{type: "all", values: [keywords]}]
@@ -55,19 +54,16 @@ const List = () => {
 
   const handleClick = (num) => {
     setPages(num)
-    console.log('num: ', num);
-    history.push(`?page=${num}${keywords.length > 0 ? `&search=${keywords.split(' ', '+')}` : ''}`);
-    const obj = {
+    history.push(`?page=${num}${keywords.length > 0 ? `&search=${keywords}` : ''}`);
+    const searchObj = {
       page: num
     }
     if (keywords.length > 0) {
-      obj.filters = [{type: "all", values: keywords.split(' ')}]
+      searchObj.filters = [{type: "all", values: [keywords]}]
     }
 
-    console.log('obj: ', obj);
-    axios.post(API_URL, { obj })
+    axios.post(API_URL, searchObj )
     .then(res => {
-      console.log('res: ', res);
       totalPages = Math.ceil(res.data.count / 20)
       setData(res.data)
     })

@@ -1,10 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Pagination from 'react-bootstrap/Pagination'
 import './Pagination.scss';
 
 const PaginationComponent = ({pages, setPages, totalPages, handleClick}) => {
-  console.log('pages: ', pages);
-  console.log('totalPages: ', totalPages);
   let before = (
     <>
       <Pagination.Item onClick={() => handleClick(pages - 2)}>{pages - 2}</Pagination.Item>
@@ -33,3 +32,9 @@ const PaginationComponent = ({pages, setPages, totalPages, handleClick}) => {
 };
 
 export default PaginationComponent;
+
+PaginationComponent.propTypes = {
+  pages: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  handleClick: PropTypes.func.isRequired,
+}

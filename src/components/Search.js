@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import './Search.scss';
@@ -21,3 +22,9 @@ const Search = ({ onSubmit, keywords, setKeywords }) => {
 };
 
 export default Search;
+
+Search.propTypes = {
+  keywords: PropTypes.array.isRequired,
+  setKeywords: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+}
