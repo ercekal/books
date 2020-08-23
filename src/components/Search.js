@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import './Search.scss';
 
-const Search = ({ onSubmit }) => {
-  const [keywords, setKeywords] = useState([])
-
+const Search = ({ onSubmit, keywords, setKeywords }) => {
   return (
     <Form inline>
       <Form.Control

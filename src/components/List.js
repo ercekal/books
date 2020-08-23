@@ -9,35 +9,65 @@ import Search from './Search'
 const  API_URL = 'http://nyx.vima.ekt.gr:3000/api/books'
 
 const List = () => {
+  const searchTerms = new URLSearchParams(window.location.search).get("search")
   const [pages, setPages] = useState(parseInt((new URLSearchParams(window.location.search)).get("page")) || 1)
   const [data, setData] = useState(null)
+  const [keywords, setKeywords] = useState(searchTerms ? searchTerms.split('+') : [])
+  console.log('keywords: ', keywords);
+
   let history = useHistory();
 
   useEffect(() => {
-    axios.post(API_URL, {page: pages})
+    let obj = {
+      page: pages
+    }
+    if (keywords.length > 0) {
+      obj.filters = [{type: "all", values: keywords}]
+    }
+    axios.post(API_URL, {
+      obj
+    })
+
     .then(res => {
       setData(res.data)
     })
     .catch(e => console.log(e))
   }, [])
 
-  useEffect(() => {
-    history.push(`?page=${pages}`);
-    axios.post(API_URL, {page: pages})
-    .then(res => setData(res.data))
-    .catch(e => console.log(e))
-  }, [pages])
-
   let totalPages = !!data && Math.ceil(data.count / 20)
 
   const onSubmit = (e, keywords) => {
+    console.log('keywords: ', keywords);
     e.preventDefault()
-    history.push(`/`);
-    axios.post(API_URL, {
-      page: 1,
-      filters:[{type: "all", values: keywords.split(' ')}]
-    })
+    if (keywords.length > 0) {
+      history.push(`/?page=${pages}&search=${keywords.split(' ', '+')}`);
+      setPages(1)
+      axios.post(API_URL, {
+        filters:[{type: "all", values: [keywords]}]
+      })
+      .then(res => {
+        totalPages = Math.ceil(res.data.count / 20)
+        setData(res.data)
+      })
+      .catch(e => console.log(e))
+    }
+  }
+
+  const handleClick = (num) => {
+    setPages(num)
+    console.log('num: ', num);
+    history.push(`?page=${num}${keywords.length > 0 ? `&search=${keywords.split(' ', '+')}` : ''}`);
+    const obj = {
+      page: num
+    }
+    if (keywords.length > 0) {
+      obj.filters = [{type: "all", values: keywords.split(' ')}]
+    }
+
+    console.log('obj: ', obj);
+    axios.post(API_URL, { obj })
     .then(res => {
+      console.log('res: ', res);
       totalPages = Math.ceil(res.data.count / 20)
       setData(res.data)
     })
@@ -81,13 +111,13 @@ const List = () => {
   )
   return (
     <div>
-      <Search onSubmit={onSubmit} />
+      <Search onSubmit={onSubmit} keywords={keywords} setKeywords={setKeywords}/>
       {renderTable()}
-      {data.books.length !== 0 &&
         <Pagination
           pages={pages}
           setPages={setPages}
-          totalPages={!!data && Math.ceil(data.count / 20)} />}
+          handleClick={handleClick}
+          totalPages={totalPages} />
     </div>
   );
 };
